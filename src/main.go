@@ -79,6 +79,26 @@ func main() {
 			continue
 		}
 
+		if update.Message.Text == "/start" {
+			oldMessages = []ChatMessage{}
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "welcome! you can send message here like you are talking to chatGPT")
+			_, err = bot.Send(msg)
+			if err != nil {
+				log.Panic(err)
+			}
+			continue
+		}
+
+		if update.Message.Text == "/refresh" {
+			oldMessages = []ChatMessage{}
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "conversation record is clear!")
+			_, err = bot.Send(msg)
+			if err != nil {
+				log.Panic(err)
+			}
+			continue
+		}
+
 		newMessage = ChatMessage{
 			Role:    "user",
 			Content: update.Message.Text,
@@ -126,7 +146,7 @@ func main() {
 
 		// 取得 usage 字串
 		usageStr := fmt.Sprintf(
-			"prompt_tokens: %d, completion_tokens: %d, total_tokens: %d",
+			"<i> prompt_tokens: %d, completion_tokens: %d, total_tokens: %d </i>",
 			chatResponse.Usage.PromptTokens,
 			chatResponse.Usage.CompletionTokens,
 			chatResponse.Usage.TotalTokens,
@@ -137,6 +157,7 @@ func main() {
 
 		// 傳送回應到 Telegram
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, reply)
+		msg.ParseMode = "HTML"
 		_, err = bot.Send(msg)
 		if err != nil {
 			log.Panic(err)
